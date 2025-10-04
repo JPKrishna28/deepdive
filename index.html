@@ -52,13 +52,14 @@
     </style>
 </head>
 <body>
-    <div id="controls">
-        <h4>Controls</h4>
-        <button onclick="resetView()">Reset View</button><br>
-        <button onclick="toggleSpeed()">Toggle Speed</button><br>
-        <button onclick="zoomIn()">Zoom In</button><br>
-        <button onclick="zoomOut()">Zoom Out</button>
-    </div>
+<div id="controls">
+    <h4>Controls</h4>
+    <button onclick="resetView()">Reset View</button><br>
+    <button onclick="toggleSpeed()">Toggle Speed</button><br>
+    <button onclick="zoomIn()">Zoom In</button><br>
+    <button onclick="zoomOut()">Zoom Out</button><br>
+    <button onclick="toggleVR()">Enter VR</button>
+</div>
 
     <div class="date-time">
         Current Time (UTC): 2025-10-04 06:58:03
@@ -432,6 +433,35 @@
     <script>
         let speedMultiplier = 1;
         let currentScale = 1.2;
+        function createStarField() {
+    const starColors = ['#FFFFFF', '#FFE4C4', '#F0F8FF', '#E6E6FA', '#FFD700', '#87CEEB'];
+    for (let i = 0; i < 500; i++) {  // Increased from 200 to 500 stars
+        const star = document.createElement('a-sphere');
+        const x = (Math.random() - 0.5) * 150;  // Increased space
+        const y = (Math.random() - 0.5) * 150;
+        const z = (Math.random() - 0.5) * 150;
+        const color = starColors[Math.floor(Math.random() * starColors.length)];
+        
+        star.setAttribute('position', `${x} ${y} ${z}`);
+        star.setAttribute('radius', Math.random() * 0.04 + 0.01);  // Slightly larger stars
+        star.setAttribute('color', color);
+        star.setAttribute('material', `emissive: ${color}; emissiveIntensity: ${Math.random() * 0.8 + 0.2}`);
+        
+        const twinkleSpeed = Math.random() * 3000 + 1000;
+        star.setAttribute('animation', `property: material.emissiveIntensity; to: ${Math.random() * 0.3 + 0.1}; dur: ${twinkleSpeed}; dir: alternate; loop: true`);
+        
+        scene.appendChild(star);
+    }
+}
+
+function toggleVR() {
+    const scene = document.querySelector('a-scene');
+    if (scene.is('vr-mode')) {
+        scene.exit('vr-mode');
+    } else {
+        scene.enterVR();
+    }
+}
 
         // Enhanced interactivity
         document.addEventListener('DOMContentLoaded', function() {
