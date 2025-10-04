@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar System VR Experience - Realistic Colors</title>
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: black;
+        }
+        
+        #controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1000;
+            border: 1px solid #333;
+        }
+
+        button {
+            background: #444;
+            color: white;
+            border: 1px solid #666;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 2px;
+        }
+
+        button:hover {
+            background: #666;
+        }
+
+        .date-time {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            color: white;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+<div id="controls">
+    <h4>Controls</h4>
+    <button onclick="resetView()">Reset View</button><br>
+    <button onclick="toggleSpeed()">Toggle Speed</button><br>
+    <button onclick="zoomIn()">Zoom In</button><br>
+    <button onclick="zoomOut()">Zoom Out</button><br>
+    <button onclick="toggleVR()">Enter VR</button>
+</div>
+
+    <div class="date-time">
+        Current Time (UTC): 2025-10-04 06:58:03
+    </div>
+
+    <a-scene
+        vr-mode-ui="enabled: true"
+        renderer="logarithmicDepthBuffer: true; colorManagement: true; physicallyCorrectLights: true;"
+        embedded
+        background="color: #000000"
+        fog="type: linear; color: #000000; near: 10; far: 50"
+        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
+        
+        <!-- Assets -->
+        <a-assets>
+            <a-mixin id="star" 
+                     geometry="primitive: sphere; radius: 0.02" 
+                     material="color: white; emissive: white; emissiveIntensity: 0.8">
+            </a-mixin>
+        </a-assets>
+
+        <!-- Solar System Container -->
+        <a-entity id="solar-system" position="0 1.6 -4" scale="1.2 1.2 1.2">
+            
+            <!-- Sun - Enhanced gradient effect -->
+            <a-sphere 
+                id="sun"
+                position="0 0 0" 
+                radius="0.5" 
+                material="shader: standard;
+                         color: #FDB813;
+                         emissive: #FF4500;
+                         emissiveIntensity: 0.8;
+                         metalness: 0;
+                         roughness: 1"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 20000">
+                <a-text 
+                    value="☉ SUN" 
+                    position="0 0.8 0" 
+                    align="center" 
+                    color="#FFD700"
+                    scale="0.8 0.8 0.8"
+                    material="emissive: #FFD700; emissiveIntensity: 0.3">
+                </a-text>
+                <!-- Enhanced corona effect -->
+                <a-sphere 
+                    radius="0.6" 
+                    material="shader: standard;
+                             color: #FF6D00;
+                             opacity: 0.2;
+                             transparent: true;
+                             side: back;
+                             emissive: #FF4500;
+                             emissiveIntensity: 0.5"
+                    animation="property: rotation; to: 0 -360 0; loop: true; dur: 30000">
+                </a-sphere>
+            </a-sphere>
+            
+            <!-- Mercury - Grey-brown with crater-like texture -->
+            <a-entity id="mercury-orbit" 
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 8000">
+                <a-sphere 
+                    position="1.2 0 0" 
+                    radius="0.08" 
+                    material="shader: standard;
+                             color: #8C7853;
+                             metalness: 0.3;
+                             roughness: 0.9;
+                             normalTextureRepeat: 2 2;
+                             normalScale: 1">
+                    <a-text 
+                        value="☿ Mercury" 
+                        position="0 0.15 0" 
+                        align="center" 
+                        color="white"
+                        scale="0.4 0.4 0.4">
+                    </a-text>
+                </a-sphere>
+                <a-ring geometry="radiusInner: 1.15; radiusOuter: 1.25" 
+                        material="color: #444; opacity: 0.1; transparent: true; side: double"
+                        rotation="-90 0 0"></a-ring>
+            </a-entity>
+            
+            <!-- Venus - Pale yellow-orange with cloud patterns -->
+            <a-entity id="venus-orbit" 
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 12000">
+                <a-sphere 
+                    position="1.6 0 0" 
+                    radius="0.12" 
+                    material="shader: standard;
+                             color: #FFE4B5;
+                             metalness: 0.1;
+                             roughness: 0.8;
+                             emissive: #DEB887;
+                             emissiveIntensity: 0.2">
+                    <a-text 
+                        value="♀ Venus" 
+                        position="0 0.2 0" 
+                        align="center" 
+                        color="white"
+                        scale="0.4 0.4 0.4">
+                    </a-text>
+                </a-sphere>
+                <a-ring geometry="radiusInner: 1.55; radiusOuter: 1.65" 
+                        material="color: #444; opacity: 0.1; transparent: true; side: double"
+                        rotation="-90 0 0"></a-ring>
+            </a-entity>
+            
+            <!-- Earth - Blue and green with white clouds -->
+            <a-entity id="earth-orbit" 
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 16000">
+                <a-sphere 
+                    position="2.0 0 0" 
+                    radius="0.13" 
+                    material="shader: standard;
+                             color: #4B90DE;
+                             metalness: 0.1;
+                             roughness: 0.7;
+                             emissive: #27AE60;
+                             emissiveIntensity: 0.2">
+                    <a-text 
+                        value="🌍 Earth" 
+                        position="0 0.22 0" 
+                        align="center" 
+                        color="white"
+                        scale="0.4 0.4 0.4">
+                    </a-text>
+                    <!-- Enhanced Moon -->
+                    <a-entity id="moon-orbit"
+                              animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
+                        <a-sphere 
+                            position="0.25 0 0" 
+                            radius="0.035" 
+                            material="shader: standard;
+                                     color: #D3D3D3;
+                                     metalness: 0.2;
+                                     roughness: 0.9;
+                                     normalScale: 1">
+                            <a-text 
+                                value="🌙" 
+                                position="0 0.06 0" 
+                                align="center" 
+                                color="white"
+                                scale="0.3 0.3 0.3">
+                            </a-text>
+                        </a-sphere>
+                    </a-entity>
+                </a-sphere>
+                <a-ring geometry="radiusInner: 1.95; radiusOuter: 2.05" 
+                        material="color: #444; opacity: 0.1; transparent: true; side: double"
+                        rotation="-90 0 0"></a-ring>
+            </a-entity>
+            
+            <!-- Mars - Rusty red with polar caps -->
+            <a-entity id="mars-orbit" 
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 20000">
+                <a-sphere 
+                    position="2.5 0 0" 
+                    radius="0.1" 
+                    material="shader: standard;
+                             color: #B7410E;
+                             metalness: 0.2;
+                             roughness: 0.8;
+                             emissive: #8B0000;
+                             emissiveIntensity: 0.1">
+                    <a-text 
+                        value="♂ Mars" 
+                        position="0 0.18 0" 
+                        align="center" 
+                        color="white"
+                        scale="0.4 0.4 0.4">
+                    </a-text>
+                    <!-- Polar caps -->
+                    <a-sphere 
+                        position="0 0.09 0" 
+                        radius="0.03" 
+                        material="color: white; opacity: 0.8">
+                    </a-sphere>
+                    <a-sphere 
+                        position="0 -0.09 0" 
+                        radius="0.03" 
+                        material="color: white; opacity: 0.8">
+                    </a-sphere>
+                </a-sphere>
+                <a-ring geometry="radiusInner: 2.45; radiusOuter: 2.55" 
+                        material="color: #444; opacity: 0.1; transparent: true; side: double"
+                        rotation="-90 0 0"></a-ring>
+            </a-entity>
+            
+            <!-- Jupiter - Enhanced bands and Great Red Spot -->
+            <a-entity id="jupiter-orbit" 
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 30000">
+                <a-sphere 
+                    position="3.2 0 0" 
+                    radius="0.35" 
+                    material="shader: standard;
+                             color: #E8B87E;
+                             metalness: 0.1;
+                             roughness: 0.7;
+                             emissive: #8B4513;
+                             emissiveIntensity: 0.2">
+                    <a-text 
+                        value="♃ Jupiter" 
+                        position="0 0.5 0" 
+                        align="center" 
+                        color="white"
+                        scale="0.5 0.5 0.5">
+                    </a-text>
+                    <!-- Enhanced Great Red Spot -->
+                    <a-sphere 
+                        position="0.3 0 0" 
+                        radius="0.08" 
+                        material="shader: standard;
+                                 color: #B22222;
+                                 emissive: #8B0000;
+                                 emissiveIntensity: 0.3;
+                                 metalness: 0.1;
+                                 roughness: 0.8">
+                    </a-sphere>
+                </a-sphere>
+                <a-ring geometry="radiusInner: 3.1; radiusOuter: 3.3" 
+                        material="color: #444; opacity: 0.1; transparent: true; side: double"
+                        rotation="-90 0 0"></a-ring>
+            </a-entity>
+            
+            <!-- Saturn - Enhanced with more detailed rings -->
+            <a-entity id="saturn-orbit" 
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 40000">
+                <a-entity position="4.0 0 0">
+                    <a-sphere 
+                        radius="0.28" 
+                        material="shader: standard;
+                                 color: #F4D03F;
+                                 metalness: 0.1;
+                                 roughness: 0.6;
+                                 emissive: #DAA520;
+                                 emissiveIntensity: 0.2">
+                        <a-text 
+                            value="♄ Saturn" 
+                            position="0 0.5 0" 
+                            align="center" 
+                            color="white"
+                            scale="0.5 0.5 0.5">
+                        </a-text>
+                    </a-sphere>
+                    <!-- Enhanced ring system -->
+                    <a-torus 
+                        radius-outer="0.5" 
+                        radius-inner="0.35" 
+                        radius-tubular="0.02"
+                        material="shader: standard;
+                                 color: #DEB887;
+                                 opacity: 0.8;
+                                 transparent: true;
+                                 metalness: 0.3;
+                                 roughness: 0.7"
+                        rotation="90 0 0">
+                    </a-torus>
+                    <a-torus 
+                        radius-outer="0.6" 
+                        radius-inner="0.55" 
+                        radius-tubular="0.01"
+                        material="shader: standard;
+                                 color: #D2B48C;
+                                 opacity: 0.6;
+                                 transparent: true;
+                                 metalness: 0.2;
+                                 roughness: 0.8"
+                        rotation="90 0 0">
+                    </a-torus>
+                </a-entity>
+                <a-ring geometry="radiusInner: 3.9; radiusOuter: 4.1" 
+                        material="color: #444; opacity: 0.1; transparent: true; side: double"
+                        rotation="-90 0 0"></a-ring>
+            </a-entity>
+            
+            <!-- Uranus - Pale blue-green -->
+            <a-entity id="uranus-orbit" 
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 50000">
+                <a-sphere 
+                    position="4.8 0 0" 
+                    radius="0.18" 
+                    material="shader: standard;
+                             color: #B2FFFF;
+                             metalness: 0.2;
+                             roughness: 0.6;
+                             emissive: #40E0D0;
+                             emissiveIntensity: 0.2">
+                    <a-text 
+                        value="⛢ Uranus" 
+                        position="0 0.3 0" 
+                        align="center" 
+                        color="white"
+                        scale="0.4 0.4 0.4">
+                    </a-text>
+                </a-sphere>
+                <a-ring geometry="radiusInner: 4.75; radiusOuter: 4.85" 
+                        material="color: #444; opacity: 0.1; transparent: true; side: double"
+                        rotation="-90 0 0"></a-ring>
+            </a-entity>
+            
+            <!-- Neptune - Deep blue -->
+            <a-entity id="neptune-orbit" 
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 60000">
+                <a-sphere 
+                    position="5.5 0 0" 
+                    radius="0.17" 
+                    material="shader: standard;
+                             color: #0066CC;
+                             metalness: 0.2;
+                             roughness: 0.5;
+                             emissive: #000080;
+                             emissiveIntensity: 0.2">
+                    <a-text 
+                        value="♆ Neptune" 
+                        position="0 0.3 0" 
+                        align="center" 
+                        color="white"
+                        scale="0.4 0.4 0.4">
+                    </a-text>
+                </a-sphere>
+                <a-ring geometry="radiusInner: 5.45; radiusOuter: 5.55" 
+                        material="color: #444; opacity: 0.1; transparent: true; side: double"
+                        rotation="-90 0 0"></a-ring>
+            </a-entity>
+            
+            <!-- Enhanced Asteroid Belt -->
+            <a-entity id="asteroid-belt">
+                <a-ring geometry="radiusInner: 2.7; radiusOuter: 3.0" 
+                        material="shader: standard;
+                                 color: #8C7853;
+                                 opacity: 0.3;
+                                 transparent: true;
+                                 metalness: 0.2;
+                                 roughness: 0.9"
+                        rotation="-90 0 0">
+                </a-ring>
+                <!-- Enhanced asteroids -->
+                <a-sphere position="2.8 0.1 0.1" radius="0.01" 
+                         material="color: #8C7853; metalness: 0.3; roughness: 0.9"></a-sphere>
+                <a-sphere position="2.7 -0.05 0.15" radius="0.008" 
+                         material="color: #8C7853; metalness: 0.3; roughness: 0.9"></a-sphere>
+                <a-sphere position="2.9 0.08 -0.1" radius="0.012" 
+                         material="color: #8C7853; metalness: 0.3; roughness: 0.9"></a-sphere>
+                <a-sphere position="2.85 -0.1 0.2" radius="0.015" 
+                         material="color: #8C7853; metalness: 0.3; roughness: 0.9"></a-sphere>
+                <a-sphere position="2.75 0.12 -0.15" radius="0.009" 
+                         material="color: #8C7853; metalness: 0.3; roughness: 0.9"></a-sphere>
+                <a-sphere position="2.95 0.05 0.05" radius="0.011" 
+                         material="color: #8C7853; metalness: 0.3; roughness: 0.9"></a-sphere>
+            </a-entity>
+        </a-entity>
+
+        <!-- Enhanced Lighting -->
+        <a-light type="ambient" color="#202040" intensity="0.3"></a-light>
+        <a-light type="directional" position="0 0 0" color="white" intensity="1.2"></a-light>
+        <a-light type="point" position="0 2 -2" color="#FFD700" intensity="0.5"></a-light>
+
+        <!-- Camera with adjusted positioning -->
+        <a-entity id="camera-rig" position="0 1.6 8">
+            <a-camera 
+                id="camera"
+                wasd-controls="acceleration: 20; fly: true"
+                look-controls="pointerLockEnabled: true"
+                cursor="rayOrigin: mouse"
+                raycaster="objects: .clickable">
+            </a-camera>
+        </a-entity>
+    </a-scene>
+
+    <script>
+        let speedMultiplier = 1;
+        let currentScale = 1.2;
+        function createStarField() {
+    const starColors = ['#FFFFFF', '#FFE4C4', '#F0F8FF', '#E6E6FA', '#FFD700', '#87CEEB'];
+    for (let i = 0; i < 500; i++) {  // Increased from 200 to 500 stars
+        const star = document.createElement('a-sphere');
+        const x = (Math.random() - 0.5) * 150;  // Increased space
+        const y = (Math.random() - 0.5) * 150;
+        const z = (Math.random() - 0.5) * 150;
+        const color = starColors[Math.floor(Math.random() * starColors.length)];
+        
+        star.setAttribute('position', `${x} ${y} ${z}`);
+        star.setAttribute('radius', Math.random() * 0.04 + 0.01);  // Slightly larger stars
+        star.setAttribute('color', color);
+        star.setAttribute('material', `emissive: ${color}; emissiveIntensity: ${Math.random() * 0.8 + 0.2}`);
+        
+        const twinkleSpeed = Math.random() * 3000 + 1000;
+        star.setAttribute('animation', `property: material.emissiveIntensity; to: ${Math.random() * 0.3 + 0.1}; dur: ${twinkleSpeed}; dir: alternate; loop: true`);
+        
+        scene.appendChild(star);
+    }
+}
+
+function toggleVR() {
+    const scene = document.querySelector('a-scene');
+    if (scene.is('vr-mode')) {
+        scene.exit('vr-mode');
+    } else {
+        scene.enterVR();
+    }
+}
+
+        // Enhanced interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            const scene = document.querySelector('a-scene');
+            const solarSystem = document.querySelector('#solar-system');
+            
+            // Add click events to planets
+            const planets = ['sun', 'mercury-orbit', 'venus-orbit', 'earth-orbit', 'mars-orbit', 'jupiter-orbit', 'saturn-orbit', 'uranus-orbit', 'neptune-orbit'];
+            
+            planets.forEach(planetId => {
+                const planet = document.querySelector('#' + planetId);
+                if (planet) {
+                    planet.classList.add('clickable');
+                    planet.addEventListener('click', function() {
+                        const sphere = planet.querySelector('a-sphere') || planet;
+                        sphere.setAttribute('animation__scale', 'property: scale; to: 1.8 1.8 1.8; dur: 800; dir: alternate; loop: 1; easing: easeInOutQuad');
+                        
+                        // Enhanced glow effect
+                        const currentMaterial = sphere.getAttribute('material') || {};
+                        sphere.setAttribute('animation__glow', 'property: material.emissiveIntensity; to: 0.8; dur: 800; dir: alternate; loop: 1');
+                    });
+                }
+            });
+
+            // Enhanced star field with varied colors
+            function createStarField() {
+                const starColors = ['#FFFFFF', '#FFE4C4', '#F0F8FF', '#E6E6FA'];
+                for (let i = 0; i < 200; i++) {
+                    const star = document.createElement('a-sphere');
+                    const x = (Math.random() - 0.5) * 100;
+                    const y = (Math.random() - 0.5) * 100;
+                    const z = (Math.random() - 0.5) * 100;
+                    const color = starColors[Math.floor(Math.random() * starColors.length)];
+                    
+                    star.setAttribute('position', `${x} ${y} ${z}`);
+                    star.setAttribute('radius', Math.random() * 0.03 + 0.01);
+                    star.setAttribute('color', color);
+                    star.setAttribute('material', `emissive: ${color}; emissiveIntensity: ${Math.random() * 0.8 + 0.2}`);
+                    
+                    const twinkleSpeed = Math.random() * 3000 + 1000;
+                    star.setAttribute('animation', `property: material.emissiveIntensity; to: ${Math.random() * 0.3 + 0.1}; dur: ${twinkleSpeed}; dir: alternate; loop: true`);
+                    
+                    scene.appendChild(star);
+                }
+            }
+
+            // Wait for scene to load
+            scene.addEventListener('loaded', function() {
+                setTimeout(createStarField, 500);
+                console.log('Solar System VR - Realistic Colors Version Loaded!');
+                
+                // Update current time
+                setInterval(() => {
+                    const now = new Date();
+                    document.querySelector('.date-time').textContent = 
+                        'Current Time (UTC): ' + now.toISOString().slice(0, 19).replace('T', ' ');
+                }, 1000);
+            });
+        });
+
+        // Control functions
+        function resetView() {
+            const cameraRig = document.querySelector('#camera-rig');
+            cameraRig.setAttribute('animation', 'property: position; to: 0 1.6 8; dur: 1000');
+            cameraRig.setAttribute('animation__rotation', 'property: rotation; to: 0 0 0; dur: 1000');
+        }
+
+        function toggleSpeed() {
+            speedMultiplier = speedMultiplier === 1 ? 3 : speedMultiplier === 3 ? 0.5 : 1;
+            
+            const orbits = document.querySelectorAll('[id$="-orbit"]');
+            orbits.forEach(orbit => {
+                const currentAnimation = orbit.getAttribute('animation');
+                if (currentAnimation) {
+                    const baseDur = parseInt(currentAnimation.match(/dur: (\d+)/)[1]);
+                    const newDur = Math.round(baseDur / speedMultiplier);
+                    orbit.setAttribute('animation', currentAnimation.replace(/dur: \d+/, `dur: ${newDur}`));
+                }
+            });
+            
+            console.log(`Speed set to ${speedMultiplier}x`);
+        }
+
+        function zoomIn() {
+            currentScale = Math.min(currentScale * 1.2, 5);
+            const solarSystem = document.querySelector('#solar-system');
+            solarSystem.setAttribute('animation', `property: scale; to: ${currentScale} ${currentScale} ${currentScale}; dur: 500`);
+        }
+
+        function zoomOut() {
+            currentScale = Math.max(currentScale / 1.2, 0.5);
+            const solarSystem = document.querySelector('#solar-system');
+            solarSystem.setAttribute('animation', `property: scale; to: ${currentScale} ${currentScale} ${currentScale}; dur: 500`);
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', function(event) {
+            switch(event.key) {
+                case 'r':
+                case 'R':
+                    resetView();
+                    break;
+                case 's':
+                case 'S':
+                    toggleSpeed();
+                    break;
+                case '+':
+                case '=':
+                    zoomIn();
+                    break;
+                case '-':
+                case '_':
+                    zoomOut();
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>

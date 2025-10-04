@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earth Tides and Wave Formation</title>
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 50, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            max-width: 300px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        #explanation {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 50, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #toggleAR {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        #controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 50, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .control-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 12px;
+        }
+
+        .wave {
+            animation: wave 4s infinite ease-in-out;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h3>Earth Tides & Wave Formation</h3>
+        <p>Explore how the Moon's gravitational pull affects Earth's oceans</p>
+        <button id="toggleAR" onclick="toggleARMode()">Switch to AR Mode</button>
+    </div>
+
+    <div id="controls">
+        <button class="control-btn" onclick="toggleAnimation()">Play/Pause</button>
+        <button class="control-btn" onclick="toggleTides()">Show/Hide Tides</button>
+        <button class="control-btn" onclick="resetView()">Reset View</button>
+    </div>
+
+    <div id="explanation">
+        <p>The Moon's gravitational pull creates two bulges in Earth's oceans: one on the side facing the Moon and one on the opposite side. 
+        As Earth rotates, these bulges create high and low tides. The Sun also affects tides, but the Moon's influence is stronger.</p>
+    </div>
+
+    <a-scene
+        id="scene"
+        embedded
+        vr-mode-ui="enabled: false"
+        renderer="logarithmicDepthBuffer: true;"
+        background="color: #000011">
+
+        <!-- Environment -->
+        <a-entity id="environment">
+            <a-sky color="#000011"></a-sky>
+            <a-entity light="type: ambient; intensity: 0.2"></a-entity>
+            <a-entity light="type: directional; intensity: 1; position: 1 1 1"></a-entity>
+        </a-entity>
+
+        <!-- Earth-Moon System -->
+        <a-entity id="system" position="0 0 -5">
+            <!-- Earth -->
+            <a-sphere
+                id="earth"
+                radius="1"
+                material="src: https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/textures/planets/earth_atmos_2048.jpg; 
+                         normalMap: https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/textures/planets/earth_normal_2048.jpg;
+                         roughnessMap: https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/textures/planets/earth_specular_2048.jpg"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 24000">
+                
+                <!-- Tidal Bulges (initially hidden) -->
+                <a-entity id="tides" visible="false">
+                    <a-torus
+                        id="tide-near"
+                        radius="1.1"
+                        radius-tubular="0.02"
+                        rotation="0 0 90"
+                        material="color: #4B7BE5; opacity: 0.3; transparent: true"
+                        class="wave">
+                    </a-torus>
+                    <a-torus
+                        id="tide-far"
+                        radius="1.1"
+                        radius-tubular="0.02"
+                        rotation="0 0 90"
+                        material="color: #4B7BE5; opacity: 0.3; transparent: true"
+                        class="wave">
+                    </a-torus>
+                </a-entity>
+            </a-sphere>
+
+            <!-- Moon's Orbit -->
+            <a-entity
+                id="moon-orbit"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 60000">
+                <!-- Moon -->
+                <a-sphere
+                    position="3 0 0"
+                    radius="0.27"
+                    material="src: https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/textures/planets/moon_1024.jpg"
+                    animation="property: rotation; to: 0 360 0; loop: true; dur: 60000">
+                </a-sphere>
+            </a-entity>
+        </a-entity>
+
+        <!-- Camera -->
+        <a-entity
+            id="rig"
+            position="0 2 2"
+            rotation="-30 0 0">
+            <a-camera
+                id="camera"
+                look-controls="enabled: true"
+                wasd-controls="enabled: true">
+            </a-camera>
+        </a-entity>
+    </a-scene>
+
+    <script>
+        let isAnimationPlaying = true;
+        let arMode = false;
+        let tidesVisible = false;
+
+        function toggleAnimation() {
+            isAnimationPlaying = !isAnimationPlaying;
+            const animations = document.querySelectorAll('[animation]');
+            animations.forEach(element => {
+                if (isAnimationPlaying) {
+                    element.components.animation.play();
+                } else {
+                    element.components.animation.pause();
+                }
+            });
+        }
+
+        function toggleTides() {
+            tidesVisible = !tidesVisible;
+            const tides = document.querySelector('#tides');
+            tides.setAttribute('visible', tidesVisible);
+        }
+
+        function resetView() {
+            const rig = document.querySelector('#rig');
+            rig.setAttribute('position', '0 2 2');
+            rig.setAttribute('rotation', '-30 0 0');
+        }
+
+        function toggleARMode() {
+            const scene = document.querySelector('#scene');
+            const toggleButton = document.querySelector('#toggleAR');
+            arMode = !arMode;
+
+            if (arMode) {
+                scene.setAttribute('arjs', 'trackingMethod: best; sourceType: webcam; debugUIEnabled: false;');
+                scene.setAttribute('embedded', 'true');
+                scene.setAttribute('renderer', 'logarithmicDepthBuffer: true;');
+                toggleButton.textContent = 'Exit AR Mode';
+            } else {
+                scene.removeAttribute('arjs');
+                toggleButton.textContent = 'Switch to AR Mode';
+            }
+        }
+
+        // Update tidal bulges based on Moon position
+        AFRAME.registerComponent('tidal-update', {
+            tick: function() {
+                if (!tidesVisible) return;
+                
+                const moonOrbit = document.querySelector('#moon-orbit');
+                const tideNear = document.querySelector('#tide-near');
+                const tideFar = document.querySelector('#tide-far');
+                
+                const rotation = moonOrbit.getAttribute('rotation').y;
+                tideNear.setAttribute('rotation', `0 ${rotation} 90`);
+                tideFar.setAttribute('rotation', `0 ${rotation + 180} 90`);
+            }
+        });
+
+        // Add the tidal-update component to the scene
+        document.querySelector('a-scene').setAttribute('tidal-update', '');
+    </script>
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="author" content="JPKrishna28" />
+    <meta name="last-modified" content="2025-10-04 07:44:39 UTC" />
+    <title>Ocean Currents Visualization</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Roboto", sans-serif;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #051937 0%, #004d7a 100%);
+            position: relative;
+        }
+        
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 50, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            max-width: 300px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        #explanation {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 50, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            width: 80%;
+            max-width: 800px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .model-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .session-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1caad9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .narration-controls {
+            position: fixed;
+            left: 50%;
+            bottom: 20px;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 25px;
+            border-radius: 30px;
+            z-index: 100;
+            display: flex;
+            gap: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .narration-button {
+            padding: 12px 20px;
+            background: #1caad9;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .narration-button:hover {
+            background: #158db6;
+            transform: translateY(-2px);
+        }
+
+        .info-panel {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 300px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+            z-index: 100;
+        }
+
+        .control-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+
+        .control-btn:hover {
+            background: #45a049;
+        }
+
+        #credits {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 50, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 2000;
+            font-size: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #credits a {
+            color: #1CAAD9;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        #credits a:hover {
+            text-decoration: underline;
+        }
+
+        #view-toggle {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 2001;
+            transition: background 0.3s;
+        }
+
+        #view-toggle:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="session-info">
+        <div class="user-info">
+            <div class="user-avatar">JP</div>
+            <div class="session-details">
+                <div>JPKrishna28</div>
+                <div class="timestamp">2025-10-04 07:44:39 UTC</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="narration-controls">
+        <button class="narration-button" onclick="speakOverview()">Overview</button>
+        <button class="narration-button" onclick="speakSurfaceCurrents()">Surface Currents</button>
+        <button class="narration-button" onclick="speakDeepCurrents()">Deep Currents</button>
+        <button class="narration-button" onclick="speakImpact()">Climate Impact</button>
+    </div>
+
+    <button class="vr-button" onclick="toggleVR()">Enter VR Mode</button>
+
+    <div class="info-panel" id="infoPanel">
+        <h3 id="infoPanelTitle"></h3>
+        <p id="infoPanelText"></p>
+    </div>
+
+    <div class="model-container" id="sketchfabViewer">
+        <iframe 
+            title="Ocean currents" 
+            frameborder="0" 
+            allowfullscreen 
+            mozallowfullscreen="true" 
+            webkitallowfullscreen="true" 
+            allow="autoplay; fullscreen; xr-spatial-tracking" 
+            xr-spatial-tracking 
+            execution-while-out-of-viewport 
+            execution-while-not-rendered 
+            web-share 
+            src="https://sketchfab.com/models/ee6837789142475eac6461a7ac4b973e/embed">
+        </iframe>
+    </div>
+
+    <div id="credits">
+        Model: 
+        <a href="https://sketchfab.com/3d-models/ocean-currents-ee6837789142475eac6461a7ac4b973e" target="_blank" rel="nofollow">
+            Ocean currents
+        </a> 
+        by 
+        <a href="https://sketchfab.com/eugenek818" target="_blank" rel="nofollow">
+            eugenek818
+        </a>
+    </div>
+
+    <a-scene 
+        id="arScene"
+        embedded
+        vr-mode-ui="enabled: false"
+        arjs="sourceType: webcam; debugUIEnabled: false;"
+        style="display: none;">
+
+        <a-marker preset="hiro">
+            <a-entity
+                position="0 0 0"
+                scale="0.1 0.1 0.1"
+                gltf-model="https://raw.githubusercontent.com/eugenek818/ocean-currents/main/scene.gltf"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 30000">
+            </a-entity>
+        </a-marker>
+
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+        const oceanData = {
+            overview: {
+                title: "Ocean Currents Overview",
+                text: "Ocean currents are massive, continuous movements of water in the ocean. They are driven by factors including wind, temperature differences, salt content, and Earth's rotation. These currents form a global conveyor belt that is crucial for Earth's climate system."
+            },
+            surfaceCurrents: {
+                title: "Surface Currents",
+                text: "Surface currents are driven primarily by global wind patterns. They move huge amounts of water horizontally across the ocean's surface and affect climate by transferring heat from the equator toward the poles."
+            },
+            deepCurrents: {
+                title: "Deep Ocean Currents",
+                text: "Deep ocean currents, also known as thermohaline circulation, are driven by differences in water density. Cold, salty water sinks at the poles and moves along the ocean bottom, while warmer water rises creating a global conveyor belt."
+            },
+            impact: {
+                title: "Climate Impact",
+                text: "Ocean currents play a vital role in regulating Earth's climate. They distribute heat globally, influence weather patterns, affect marine ecosystems, and help regulate the carbon cycle. Changes in these currents can have significant impacts on global climate."
+            }
+        };
+
+        let currentSpeech = null;
+        let isARView = false;
+
+        function speak(section) {
+            stopSpeaking();
+
+            const data = oceanData[section];
+            const infoPanel = document.getElementById("infoPanel");
+            document.getElementById("infoPanelTitle").textContent = data.title;
+            document.getElementById("infoPanelText").textContent = data.text;
+            infoPanel.style.display = "block";
+
+            currentSpeech = new SpeechSynthesisUtterance(data.text);
+            currentSpeech.rate = 0.9;
+            currentSpeech.pitch = 1;
+
+            currentSpeech.onend = () => {
+                setTimeout(() => {
+                    if (!currentSpeech) {
+                        infoPanel.style.display = "none";
+                    }
+                }, 3000);
+            };
+            window.speechSynthesis.speak(currentSpeech);
+        }
+
+        function stopSpeaking() {
+            if (currentSpeech) {
+                window.speechSynthesis.cancel();
+                currentSpeech = null;
+                document.getElementById("infoPanel").style.display = "none";
+            }
+        }
+
+        function speakOverview() { speak("overview"); }
+        function speakSurfaceCurrents() { speak("surfaceCurrents"); }
+        function speakDeepCurrents() { speak("deepCurrents"); }
+        function speakImpact() { speak("impact"); }
+
+        function toggleVR() {
+            const iframe = document.querySelector('iframe');
+            if (iframe.requestFullscreen) {
+                iframe.requestFullscreen();
+            }
+        }
+
+        function toggleView() {
+            const modelViewer = document.getElementById('sketchfabViewer');
+            const arScene = document.getElementById('arScene');
+            const toggleButton = document.getElementById('view-toggle');
+            const explanation = document.getElementById('explanation');
+            
+            isARView = !isARView;
+            
+            if (isARView) {
+                modelViewer.style.display = 'none';
+                arScene.style.display = 'block';
+                toggleButton.textContent = 'Switch to 3D View';
+                explanation.style.display = 'none';
+            } else {
+                modelViewer.style.display = 'block';
+                arScene.style.display = 'none';
+                toggleButton.textContent = 'Switch to AR View';
+                explanation.style.display = 'block';
+            }
+        }
+
+        // Add touch interaction for mobile devices
+        // Initialize voice selection
+        window.speechSynthesis.onvoiceschanged = () => {
+            const voices = window.speechSynthesis.getVoices();
+            const preferredVoice = voices.find(voice => 
+                voice.lang === "en-US" && voice.name.includes("Female")
+            ) || voices[0];
+
+            if (preferredVoice) {
+                currentSpeech = new SpeechSynthesisUtterance();
+                currentSpeech.voice = preferredVoice;
+                currentSpeech.rate = 0.9;
+                currentSpeech.pitch = 1;
+            }
+        };
+
+        // Error handling
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            console.error("Error: ", {
+                message: msg,
+                url: url,
+                line: lineNo,
+                column: columnNo,
+                error: error,
+                time: new Date().toISOString(),
+            });
+            return false;
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const arModel = document.querySelector('a-entity[gltf-model]');
+            
+            arModel.addEventListener('click', function() {
+                this.setAttribute('animation', {
+                    property: 'rotation',
+                    to: '0 360 0',
+                    dur: 15000,
+                    easing: 'linear',
+                    loop: true
+                });
+            });
+        });
+    </script>
+</body>
+</html>
