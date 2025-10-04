@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar System AR Experience</title>
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            max-width: 300px;
+        }
+        
+        #instructions {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h3>Solar System AR</h3>
+        <p>Point your camera at a flat surface to see the solar system appear!</p>
+        <p>The planets will orbit around the sun automatically.</p>
+    </div>
+    
+    <div id="instructions">
+        <p>📱 Allow camera access when prompted<br>
+        🔍 Point camera at a flat surface<br>
+        ⭐ Watch the solar system come to life!</p>
+    </div>
+
+    <a-scene
+        vr-mode-ui="enabled: false"
+        renderer="logarithmicDepthBuffer: true;"
+        embedded
+        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
+        
+        <!-- Assets -->
+        <a-assets>
+            <!-- Planet textures would go here - using colors for now -->
+        </a-assets>
+
+        <!-- Solar System Container -->
+        <a-entity id="solar-system" position="0 0 -3">
+            
+            <!-- Sun at the center -->
+            <a-sphere 
+                id="sun"
+                position="0 0 0" 
+                radius="0.3" 
+                color="#FDB813"
+                material="emissive: #FF6D00; emissiveIntensity: 0.3"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 20000">
+                <a-text 
+                    value="Sun" 
+                    position="0 0.5 0" 
+                    align="center" 
+                    color="white"
+                    scale="0.5 0.5 0.5">
+                </a-text>
+            </a-sphere>
+            
+            <!-- Mercury -->
+            <a-entity id="mercury-orbit" 
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 8000">
+                <a-sphere 
+                    position="0.8 0 0" 
+                    radius="0.04" 
+                    color="#8C7853">
+                    <a-text 
+                        value="Mercury" 
+                        position="0 0.1 0" 
+                        align="center" 
+                        color="white"
+                        scale="0.3 0.3 0.3">
+                    </a-text>
+                </a-sphere>
+            </a-entity>
+            
+            <!-- Venus -->
+            <a-entity id="venus-orbit" 
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 12000">
+                <a-sphere 
+                    position="1.1 0 0" 
+                    radius="0.08" 
+                    color="#FFC649">
+                    <a-text 
+                        value="Venus" 
+                        position="0 0.15 0" 
+                        align="center" 
+                        color="white"
+                        scale="0.3 0.3 0.3">
+                    </a-text>
+                </a-sphere>
+            </a-entity>
+            
+            <!-- Earth -->
+            <a-entity id="earth-orbit" 
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 16000">
+                <a-sphere 
+                    position="1.4 0 0" 
+                    radius="0.09" 
+                    color="#6B93D6">
+                    <a-text 
+                        value="Earth" 
+                        position="0 0.15 0" 
+                        align="center" 
+                        color="white"
+                        scale="0.3 0.3 0.3">
+                    </a-text>
+                    <!-- Moon -->
+                    <a-entity id="moon-orbit"
+                              animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
+                        <a-sphere 
+                            position="0.15 0 0" 
+                            radius="0.02" 
+                            color="#C0C0C0">
+                        </a-sphere>
+                    </a-entity>
+                </a-sphere>
+            </a-entity>
+            
+            <!-- Mars -->
+            <a-entity id="mars-orbit" 
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 20000">
+                <a-sphere 
+                    position="1.8 0 0" 
+                    radius="0.06" 
+                    color="#CD5C5C">
+                    <a-text 
+                        value="Mars" 
+                        position="0 0.12 0" 
+                        align="center" 
+                        color="white"
+                        scale="0.3 0.3 0.3">
+                    </a-text>
+                </a-sphere>
+            </a-entity>
+            
+            <!-- Jupiter -->
+            <a-entity id="jupiter-orbit" 
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 30000">
+                <a-sphere 
+                    position="2.4 0 0" 
+                    radius="0.2" 
+                    color="#D8CA9D">
+                    <a-text 
+                        value="Jupiter" 
+                        position="0 0.3 0" 
+                        align="center" 
+                        color="white"
+                        scale="0.3 0.3 0.3">
+                    </a-text>
+                </a-sphere>
+            </a-entity>
+            
+            <!-- Saturn -->
+            <a-entity id="saturn-orbit" 
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 40000">
+                <a-entity position="3.0 0 0">
+                    <a-sphere 
+                        radius="0.18" 
+                        color="#FAD5A5">
+                        <a-text 
+                            value="Saturn" 
+                            position="0 0.35 0" 
+                            align="center" 
+                            color="white"
+                            scale="0.3 0.3 0.3">
+                        </a-text>
+                    </a-sphere>
+                    <!-- Saturn's rings -->
+                    <a-torus 
+                        radius-outer="0.3" 
+                        radius-inner="0.25" 
+                        radius-tubular="0.01"
+                        color="#C4A484"
+                        rotation="90 0 0"
+                        material="opacity: 0.7; transparent: true">
+                    </a-torus>
+                </a-entity>
+            </a-entity>
+            
+            <!-- Uranus -->
+            <a-entity id="uranus-orbit" 
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 50000">
+                <a-sphere 
+                    position="3.6 0 0" 
+                    radius="0.12" 
+                    color="#4FD0E7">
+                    <a-text 
+                        value="Uranus" 
+                        position="0 0.2 0" 
+                        align="center" 
+                        color="white"
+                        scale="0.3 0.3 0.3">
+                    </a-text>
+                </a-sphere>
+            </a-entity>
+            
+            <!-- Neptune -->
+            <a-entity id="neptune-orbit" 
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 60000">
+                <a-sphere 
+                    position="4.2 0 0" 
+                    radius="0.11" 
+                    color="#4b70dd">
+                    <a-text 
+                        value="Neptune" 
+                        position="0 0.2 0" 
+                        align="center" 
+                        color="white"
+                        scale="0.3 0.3 0.3">
+                    </a-text>
+                </a-sphere>
+            </a-entity>
+            
+            <!-- Asteroid Belt visualization -->
+            <a-entity id="asteroid-belt">
+                <!-- Multiple small asteroids -->
+                <a-sphere position="2.1 0.1 0.1" radius="0.005" color="#8C7853"></a-sphere>
+                <a-sphere position="2.0 -0.05 0.15" radius="0.003" color="#8C7853"></a-sphere>
+                <a-sphere position="2.2 0.08 -0.1" radius="0.004" color="#8C7853"></a-sphere>
+                <a-sphere position="2.15 -0.1 0.2" radius="0.006" color="#8C7853"></a-sphere>
+                <a-sphere position="1.95 0.12 -0.15" radius="0.003" color="#8C7853"></a-sphere>
+                <a-sphere position="2.25 0.05 0.05" radius="0.005" color="#8C7853"></a-sphere>
+            </a-entity>
+            
+        </a-entity>
+
+        <!-- Lighting -->
+        <a-light type="ambient" color="#404040" intensity="0.4"></a-light>
+        <a-light type="directional" position="0 0 0" color="white" intensity="0.8"></a-light>
+
+        <!-- Camera -->
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+        // Check for WebXR support
+        if (!navigator.xr) {
+            console.log('WebXR not supported');
+        }
+
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            const scene = document.querySelector('a-scene');
+            const solarSystem = document.querySelector('#solar-system');
+            
+            // Add click events to planets for more info
+            const planets = ['sun', 'mercury-orbit', 'venus-orbit', 'earth-orbit', 'mars-orbit', 'jupiter-orbit', 'saturn-orbit', 'uranus-orbit', 'neptune-orbit'];
+            
+            planets.forEach(planetId => {
+                const planet = document.querySelector('#' + planetId);
+                if (planet) {
+                    planet.addEventListener('click', function() {
+                        // Scale up the clicked planet temporarily
+                        const sphere = planet.querySelector('a-sphere') || planet;
+                        const originalScale = sphere.getAttribute('scale') || '1 1 1';
+                        sphere.setAttribute('animation__scale', 'property: scale; to: 1.5 1.5 1.5; dur: 500; dir: alternate; loop: 1');
+                    });
+                }
+            });
+
+            // Add some random twinkling stars in the background
+            function createStars() {
+                for (let i = 0; i < 50; i++) {
+                    const star = document.createElement('a-sphere');
+                    const x = (Math.random() - 0.5) * 20;
+                    const y = (Math.random() - 0.5) * 20;
+                    const z = (Math.random() - 0.5) * 20;
+                    
+                    star.setAttribute('position', `${x} ${y} ${z}`);
+                    star.setAttribute('radius', '0.01');
+                    star.setAttribute('color', 'white');
+                    star.setAttribute('material', 'emissive: white; emissiveIntensity: 0.5');
+                    
+                    // Add twinkling animation
+                    star.setAttribute('animation', 'property: material.emissiveIntensity; to: 0.1; dur: 2000; dir: alternate; loop: true');
+                    
+                    scene.appendChild(star);
+                }
+            }
+
+            // Wait for scene to load before adding stars
+            scene.addEventListener('loaded', function() {
+                setTimeout(createStars, 1000);
+            });
+        });
+    </script>
+</body>
+</html>
