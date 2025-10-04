@@ -106,8 +106,8 @@
             </a-mixin>
         </a-assets>
 
-        <!-- Solar System Container - Positioned closer and larger -->
-        <a-entity id="solar-system" position="0 1.6 -2" scale="1.5 1.5 1.5">
+        <!-- Solar System Container - Positioned for optimal viewing -->
+        <a-entity id="solar-system" position="0 1.6 -4" scale="1.2 1.2 1.2">
             
             <!-- Sun at the center - Much larger and more prominent -->
             <a-sphere 
@@ -367,7 +367,7 @@
         <a-light type="point" position="0 2 -2" color="#FFD700" intensity="0.5"></a-light>
 
         <!-- Camera with better positioning -->
-        <a-entity id="camera-rig" position="0 1.6 0">
+        <a-entity id="camera-rig" position="0 1.6 8">
             <a-camera 
                 id="camera"
                 wasd-controls="acceleration: 20; fly: true"
@@ -380,7 +380,7 @@
 
     <script>
         let speedMultiplier = 1;
-        let currentScale = 1.5;
+        let currentScale = 1.2;
 
         // Enhanced interactivity
         document.addEventListener('DOMContentLoaded', function() {
@@ -437,7 +437,7 @@
         // Control functions
         function resetView() {
             const cameraRig = document.querySelector('#camera-rig');
-            cameraRig.setAttribute('animation', 'property: position; to: 0 1.6 0; dur: 1000');
+            cameraRig.setAttribute('animation', 'property: position; to: 0 1.6 8; dur: 1000');
             cameraRig.setAttribute('animation__rotation', 'property: rotation; to: 0 0 0; dur: 1000');
         }
 
