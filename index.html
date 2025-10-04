@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
     <title>Solar System AR Experience</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ar.js@3.4.5/aframe/build/aframe-ar.min.js"></script>
@@ -10,48 +11,85 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
+            overflow: hidden;
         }
         
         #info {
             position: absolute;
             top: 10px;
             left: 10px;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             color: white;
             padding: 15px;
-            border-radius: 5px;
+            border-radius: 8px;
             z-index: 1000;
             max-width: 300px;
+            font-size: 14px;
         }
         
         #instructions {
             position: absolute;
             bottom: 10px;
             left: 10px;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             color: white;
             padding: 10px;
-            border-radius: 5px;
+            border-radius: 8px;
             z-index: 1000;
+            font-size: 12px;
+        }
+
+        #error-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            z-index: 1001;
+            display: none;
+            text-align: center;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            z-index: 999;
         }
     </style>
 </head>
 <body>
+    <div class="loading" id="loading">Loading AR Experience...</div>
+    
+    <div id="error-message">
+        <h3>AR Not Available</h3>
+        <p>This device doesn't support AR or camera access was denied.</p>
+        <button onclick="location.reload()">Try Again</button>
+    </div>
+
     <div id="info">
-        <h3>Solar System AR</h3>
+        <h3>🌌 Solar System AR</h3>
         <p>Point your camera at a flat surface to see the solar system appear!</p>
         <p>The planets will orbit around the sun automatically.</p>
+        <small>Works best in good lighting on a flat surface</small>
     </div>
     
     <div id="instructions">
         <p>📱 Allow camera access when prompted<br>
         🔍 Point camera at a flat surface<br>
-        ⭐ Watch the solar system come to life!</p>
+        ⭐ Watch the solar system come to life!<br>
+        👆 Tap planets to interact</p>
     </div>
 
     <a-scene
         vr-mode-ui="enabled: false"
-        renderer="logarithmicDepthBuffer: true; colorManagement: true; sortObjects: true;"
+        renderer="logarithmicDepthBuffer: true; colorManagement: true; sortObjects: true; antialias: true;"
         embedded
         arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
         gesture-detector
@@ -59,11 +97,11 @@
         
         <!-- Assets -->
         <a-assets>
-            <!-- Planet textures would go here - using colors for now -->
+            <!-- Preload any textures or assets here -->
         </a-assets>
 
         <!-- Solar System Container -->
-        <a-entity id="solar-system" position="0 0 -3">
+        <a-entity id="solar-system" position="0 0 -3" scale="0.8 0.8 0.8">
             
             <!-- Sun at the center -->
             <a-sphere 
@@ -71,14 +109,16 @@
                 position="0 0 0" 
                 radius="0.3" 
                 color="#FDB813"
-                material="emissive: #FF6D00; emissiveIntensity: 0.3"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 20000">
+                material="emissive: #FF6D00; emissiveIntensity: 0.4; shader: standard;"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 20000"
+                class="clickable">
                 <a-text 
                     value="Sun" 
                     position="0 0.5 0" 
                     align="center" 
                     color="white"
-                    scale="0.5 0.5 0.5">
+                    scale="0.5 0.5 0.5"
+                    shader="msdf">
                 </a-text>
             </a-sphere>
             
@@ -88,13 +128,15 @@
                 <a-sphere 
                     position="0.8 0 0" 
                     radius="0.04" 
-                    color="#8C7853">
+                    color="#8C7853"
+                    class="clickable">
                     <a-text 
                         value="Mercury" 
                         position="0 0.1 0" 
                         align="center" 
                         color="white"
-                        scale="0.3 0.3 0.3">
+                        scale="0.3 0.3 0.3"
+                        shader="msdf">
                     </a-text>
                 </a-sphere>
             </a-entity>
@@ -105,13 +147,15 @@
                 <a-sphere 
                     position="1.1 0 0" 
                     radius="0.08" 
-                    color="#FFC649">
+                    color="#FFC649"
+                    class="clickable">
                     <a-text 
                         value="Venus" 
                         position="0 0.15 0" 
                         align="center" 
                         color="white"
-                        scale="0.3 0.3 0.3">
+                        scale="0.3 0.3 0.3"
+                        shader="msdf">
                     </a-text>
                 </a-sphere>
             </a-entity>
@@ -122,13 +166,15 @@
                 <a-sphere 
                     position="1.4 0 0" 
                     radius="0.09" 
-                    color="#6B93D6">
+                    color="#6B93D6"
+                    class="clickable">
                     <a-text 
                         value="Earth" 
                         position="0 0.15 0" 
                         align="center" 
                         color="white"
-                        scale="0.3 0.3 0.3">
+                        scale="0.3 0.3 0.3"
+                        shader="msdf">
                     </a-text>
                     <!-- Moon -->
                     <a-entity id="moon-orbit"
@@ -148,13 +194,15 @@
                 <a-sphere 
                     position="1.8 0 0" 
                     radius="0.06" 
-                    color="#CD5C5C">
+                    color="#CD5C5C"
+                    class="clickable">
                     <a-text 
                         value="Mars" 
                         position="0 0.12 0" 
                         align="center" 
                         color="white"
-                        scale="0.3 0.3 0.3">
+                        scale="0.3 0.3 0.3"
+                        shader="msdf">
                     </a-text>
                 </a-sphere>
             </a-entity>
@@ -165,13 +213,15 @@
                 <a-sphere 
                     position="2.4 0 0" 
                     radius="0.2" 
-                    color="#D8CA9D">
+                    color="#D8CA9D"
+                    class="clickable">
                     <a-text 
                         value="Jupiter" 
                         position="0 0.3 0" 
                         align="center" 
                         color="white"
-                        scale="0.3 0.3 0.3">
+                        scale="0.3 0.3 0.3"
+                        shader="msdf">
                     </a-text>
                 </a-sphere>
             </a-entity>
@@ -182,13 +232,15 @@
                 <a-entity position="3.0 0 0">
                     <a-sphere 
                         radius="0.18" 
-                        color="#FAD5A5">
+                        color="#FAD5A5"
+                        class="clickable">
                         <a-text 
                             value="Saturn" 
                             position="0 0.35 0" 
                             align="center" 
                             color="white"
-                            scale="0.3 0.3 0.3">
+                            scale="0.3 0.3 0.3"
+                            shader="msdf">
                         </a-text>
                     </a-sphere>
                     <!-- Saturn's rings -->
@@ -209,13 +261,15 @@
                 <a-sphere 
                     position="3.6 0 0" 
                     radius="0.12" 
-                    color="#4FD0E7">
+                    color="#4FD0E7"
+                    class="clickable">
                     <a-text 
                         value="Uranus" 
                         position="0 0.2 0" 
                         align="center" 
                         color="white"
-                        scale="0.3 0.3 0.3">
+                        scale="0.3 0.3 0.3"
+                        shader="msdf">
                     </a-text>
                 </a-sphere>
             </a-entity>
@@ -226,13 +280,15 @@
                 <a-sphere 
                     position="4.2 0 0" 
                     radius="0.11" 
-                    color="#4b70dd">
+                    color="#4b70dd"
+                    class="clickable">
                     <a-text 
                         value="Neptune" 
                         position="0 0.2 0" 
                         align="center" 
                         color="white"
-                        scale="0.3 0.3 0.3">
+                        scale="0.3 0.3 0.3"
+                        shader="msdf">
                     </a-text>
                 </a-sphere>
             </a-entity>
@@ -251,56 +307,92 @@
         </a-entity>
 
         <!-- Lighting -->
-        <a-light type="ambient" color="#404040" intensity="0.4"></a-light>
+        <a-light type="ambient" color="#404040" intensity="0.5"></a-light>
         <a-light type="directional" position="0 0 0" color="white" intensity="0.8"></a-light>
 
         <!-- Camera -->
-        <a-entity camera></a-entity>
+        <a-entity camera look-controls-enabled="false" wasd-controls-enabled="false"></a-entity>
     </a-scene>
 
     <script>
-        // Check for WebXR support
-        if (!navigator.xr) {
-            console.log('WebXR not supported');
+        // Error handling and device compatibility
+        let hasWebRTC = false;
+        let hasUserMedia = false;
+
+        // Check for camera support
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            hasUserMedia = true;
         }
+
+        // Check for WebRTC support
+        if (window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection) {
+            hasWebRTC = true;
+        }
+
+        // Handle AR.js loading and errors
+        const scene = document.querySelector('a-scene');
+        const loading = document.getElementById('loading');
+        const errorMessage = document.getElementById('error-message');
+
+        // Hide loading when scene loads
+        scene.addEventListener('loaded', function() {
+            loading.style.display = 'none';
+            console.log('AR scene loaded successfully');
+        });
+
+        // Handle AR.js errors
+        scene.addEventListener('arjs-error', function(event) {
+            console.error('AR.js error:', event.detail);
+            loading.style.display = 'none';
+            errorMessage.style.display = 'block';
+        });
+
+        // Camera permission handling
+        scene.addEventListener('camera-init', function() {
+            console.log('Camera initialized');
+        });
+
+        scene.addEventListener('camera-error', function(event) {
+            console.error('Camera error:', event.detail);
+            loading.style.display = 'none';
+            errorMessage.style.display = 'block';
+        });
 
         // Add some interactivity
         document.addEventListener('DOMContentLoaded', function() {
-            const scene = document.querySelector('a-scene');
-            const solarSystem = document.querySelector('#solar-system');
-            
             // Add click events to planets for more info
-            const planets = ['sun', 'mercury-orbit', 'venus-orbit', 'earth-orbit', 'mars-orbit', 'jupiter-orbit', 'saturn-orbit', 'uranus-orbit', 'neptune-orbit'];
+            const clickablePlanets = document.querySelectorAll('.clickable');
             
-            planets.forEach(planetId => {
-                const planet = document.querySelector('#' + planetId);
-                if (planet) {
-                    planet.addEventListener('click', function() {
-                        // Scale up the clicked planet temporarily
-                        const sphere = planet.querySelector('a-sphere') || planet;
-                        const originalScale = sphere.getAttribute('scale') || '1 1 1';
-                        sphere.setAttribute('animation__scale', 'property: scale; to: 1.5 1.5 1.5; dur: 500; dir: alternate; loop: 1');
-                    });
-                }
+            clickablePlanets.forEach(planet => {
+                planet.addEventListener('click', function() {
+                    // Scale up the clicked planet temporarily
+                    planet.setAttribute('animation__scale', 'property: scale; to: 1.5 1.5 1.5; dur: 500; dir: alternate; loop: 1');
+                    
+                    // Add a glow effect
+                    const currentColor = planet.getAttribute('color');
+                    planet.setAttribute('animation__glow', 'property: material.emissiveIntensity; to: 0.5; dur: 500; dir: alternate; loop: 1');
+                });
             });
 
             // Add some random twinkling stars in the background
             function createStars() {
-                for (let i = 0; i < 50; i++) {
+                const solarSystem = document.querySelector('#solar-system');
+                for (let i = 0; i < 30; i++) {
                     const star = document.createElement('a-sphere');
-                    const x = (Math.random() - 0.5) * 20;
-                    const y = (Math.random() - 0.5) * 20;
-                    const z = (Math.random() - 0.5) * 20;
+                    const x = (Math.random() - 0.5) * 15;
+                    const y = (Math.random() - 0.5) * 15;
+                    const z = (Math.random() - 0.5) * 15;
                     
                     star.setAttribute('position', `${x} ${y} ${z}`);
-                    star.setAttribute('radius', '0.01');
+                    star.setAttribute('radius', '0.008');
                     star.setAttribute('color', 'white');
-                    star.setAttribute('material', 'emissive: white; emissiveIntensity: 0.5');
+                    star.setAttribute('material', 'emissive: white; emissiveIntensity: 0.8');
                     
                     // Add twinkling animation
-                    star.setAttribute('animation', 'property: material.emissiveIntensity; to: 0.1; dur: 2000; dir: alternate; loop: true');
+                    const delay = Math.random() * 2000;
+                    star.setAttribute('animation', `property: material.emissiveIntensity; to: 0.1; dur: 2000; dir: alternate; loop: true; delay: ${delay}`);
                     
-                    scene.appendChild(star);
+                    solarSystem.appendChild(star);
                 }
             }
 
@@ -308,6 +400,25 @@
             scene.addEventListener('loaded', function() {
                 setTimeout(createStars, 1000);
             });
+        });
+
+        // Device orientation handling for mobile
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', function(event) {
+                // Handle device orientation changes if needed
+            });
+        }
+
+        // Performance monitoring
+        let frameCount = 0;
+        const startTime = Date.now();
+
+        scene.addEventListener('enter-vr', function() {
+            console.log('Entered AR mode');
+        });
+
+        scene.addEventListener('exit-vr', function() {
+            console.log('Exited AR mode');
         });
     </script>
 </body>
